@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Chinawalaa Admin</title>
+<style>
+:root{--bg:#FFF8F3;--card:#fff;--ink:#3A2A24;--line:#E8D9CF;--pri:#C2522F;--ok:#2E7D32}
+@media(prefers-color-scheme:dark){:root{--bg:#1E1815;--card:#2A221E;--ink:#F4E9E2;--line:#4A3C35;--pri:#E07A57}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif}
+.w{max-width:960px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:0}h2{font-size:18px;margin:20px 0 8px}
+input,select,textarea,button{font:inherit;color:inherit}
+input,select,textarea{width:100%;min-height:44px;padding:8px 10px;border:2px solid var(--line);border-radius:10px;background:var(--card)}
+textarea{min-height:80px}label{display:block;font-size:13px;font-weight:700;margin:10px 0 4px}
+button{min-height:44px;padding:0 16px;border-radius:10px;border:2px solid var(--line);background:var(--card);cursor:pointer;font-weight:700}
+.p{background:var(--pri);border-color:var(--pri);color:#fff}.d{color:#C62828}
+.bar{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.bar .sp{flex:1}.tab[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.pc,.oc,.box{background:var(--card);border:1px solid var(--line);border-radius:14px;margin:10px 0}
+.box,.oc{padding:14px}.pc>summary{padding:12px 14px;cursor:pointer;display:flex;gap:12px;align-items:center;min-height:56px}
+.pc>summary span{opacity:.7;font-size:14px}.pc .fg{padding:0 14px 14px}
+.th{width:44px;height:44px;border-radius:8px;object-fit:cover;background:var(--line);flex:none}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0 14px}
+.oh{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}.oh select{width:auto}
+#lg{max-width:360px;margin:15vh auto}#ts{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;display:none}
+.hint{font-size:13px;opacity:.7}
+</style></head><body>
+<div id="lg" class="w"><h1>Chinawalaa Admin</h1><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password">
+<p id="le" style="color:#C62828"></p><button class="p" id="lb" style="width:100%">Log in</button></div>
+
+<div id="app" class="w" hidden>
+<div class="bar"><h1>Admin</h1>
+<button class="tab" data-t="tp">Products</button><button class="tab" data-t="tg">Page details</button><button class="tab" data-t="to">Orders</button><button class="tab" data-t="ts2">Email list</button>
+<span class="sp"></span><button class="p" id="sv">Save changes</button><button id="lo">Log out</button></div>
+<div id="tp"></div><div id="tg" hidden></div><div id="to" hidden></div><div id="ts2" hidden></div>
+</div><div id="ts" role="status"></div>
+
+<script>
+var DEF={products:[{"id":1,"n":"Feeding Bottle 250 ml","c":"baby","p":1450,"o":1800,"i":"bottle","z":"250 ml","d":"Easy-grip bottle with a soft nipple for comfortable feeding.","l":"A 250 ml feeding bottle designed for everyday use. The wide neck makes filling with milk or formula quick and cleaning easy, and the soft nipple helps baby feed comfortably. Clear measurement marks let you keep track of every feed.","f":["250 ml capacity with measurement marks","Soft nipple for comfortable feeding","Wide neck for easy filling and cleaning","Easy-grip shape for small hands"],"q":10},{"id":2,"n":"Silicone Pacifier Set","c":"baby","p":990,"i":"pac","z":"Set of 2","d":"Soft silicone pacifiers with a gentle, baby-friendly shape.","l":"A set of soft silicone pacifiers shaped to sit comfortably in baby's mouth. The lightweight design keeps things comfortable, and the smooth silicone is easy to wash and keep clean.","f":["Set of 2 pacifiers","Soft, flexible silicone","Lightweight design","Easy to wash and keep clean"],"q":10},{"id":3,"n":"Soft Plush Teddy","c":"baby","p":1800,"i":"toy","z":"Medium","d":"Super soft plush teddy for cuddles and bedtime.","l":"A soft, huggable teddy for playtime and bedtime. The smooth plush fabric feels gentle to touch and the cuddly shape makes it a lovely companion or a thoughtful gift for a little one.","f":["Super soft plush fabric","Cuddly size for hugs and bedtime","A lovely baby gift","Please supervise young children during play"],"q":10},{"id":4,"n":"Baby Lotion","c":"baby","p":1250,"i":"drop","z":"200 ml","d":"Gentle daily moisturizing lotion for baby's delicate skin.","l":"A gentle lotion made for everyday use on baby's skin, especially after bath time. It spreads easily and leaves skin feeling soft and moisturized. Do a small patch test before first use and stop using it if irritation occurs.","f":["Gentle everyday moisturizing","Light, easy-to-spread texture","Great after bath time","Patch test before first use"],"q":10},{"id":5,"n":"Baby Wipes, 3-pack","c":"baby","p":850,"i":"box","z":"3 packs","d":"Soft, gentle wipes for quick, everyday clean-ups.","l":"A convenient 3-pack of soft baby wipes for diaper changes, hands and faces. Keep one pack at home, one in the diaper bag and one spare so you are never caught without them.","f":["Value 3-pack","Soft on baby's skin","Handy for diaper changes and quick clean-ups","Easy to carry"],"q":10},{"id":6,"n":"Baby Spoon and Bowl Set","c":"baby","p":1100,"i":"spoon","z":"Set","d":"Easy-grip spoon and bowl set for first meals.","l":"A feeding set made for little ones starting solids. The spoon is shaped for small mouths and the bowl is sized for baby-friendly portions, making mealtimes simpler for both of you.","f":["Spoon and bowl set","Shaped for small mouths and hands","Right-sized for baby portions","Easy to clean"],"q":10},{"id":7,"n":"Glass Food Containers","c":"home","p":3200,"i":"box","z":"Set","d":"Glass containers for storing leftovers and meal prep.","l":"Keep leftovers, meal prep and pantry items fresh in these glass food containers. Glass does not hold onto colors or smells, and the different sizes suit everything from snacks to full meals.","f":["Glass construction","Multiple sizes in one set","Does not absorb colors or smells","Neat stacking for easy storage"],"q":10},{"id":8,"n":"Silicone Kitchen Spoons","c":"home","p":1100,"i":"spoon","z":"Set","d":"Soft-edge silicone spoons for cooking and serving.","l":"A set of silicone kitchen spoons for stirring, serving and scraping. The soft edges are gentle on non-stick cookware and the comfortable handles make everyday cooking easier.","f":["Soft edges, gentle on cookware","Comfortable handles","Set for everyday cooking","Easy to wash"],"q":10},{"id":9,"n":"Laundry Basket","c":"home","p":2400,"i":"basket","z":"Large","d":"Roomy laundry basket for carrying and sorting clothes.","l":"A large laundry basket with space for a full load. The open design lets air circulate, and the handles make it easy to carry from room to room.","f":["Large capacity","Handles for easy carrying","Ventilated design","Lightweight and easy to move"],"q":10},{"id":10,"n":"Storage Organizer","c":"home","p":2000,"i":"box","z":"Standard","d":"Keep shelves, cupboards and rooms neat and organized.","l":"A storage organizer for tidying household items, baby supplies or kitchen essentials. It makes it easy to see and reach what you need and keeps shelves, cupboards and rooms neat.","f":["Versatile for home or nursery","Helps keep items sorted and visible","Space-saving design","Easy to clean"],"q":10}],site:{ann:"Imported baby & household products, delivered to your door",h1:"Everything for baby & home, in one basket.",hp:"Quality imported baby products and household essentials, chosen for your family and brought straight to you.",email:"chinawalaa@gmail.com",wa:"923234336947",delCod:350,delOnline:100,bank:"",title:"",acct:"",jazz:"",soon:["cosm","home"]}};
+var K="cw-admin",pw=sessionStorage.getItem(K)||"",S={products:[],site:{}},ST=["new","confirmed","paid","shipped","delivered","cancelled"],O=[];
+function $(s){return document.querySelector(s)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function toast(m){var t=$("#ts");t.textContent=m;t.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(function(){t.style.display="none"},2600)}
+async function api(p,o){o=o||{};o.headers={"x-admin-password":pw,"content-type":"application/json"};var r=await fetch("/api/"+p,o),j=await r.json().catch(function(){return{}});if(r.status==401)throw new Error("auth");if(!r.ok)throw new Error(j.error||"Error");return j}
+
+async function login(){pw=$("#pw").value;try{await api("admin/ping");sessionStorage.setItem(K,pw);start()}catch(e){$("#le").textContent=e.message=="auth"?"Wrong password.":"Cannot reach the server. The site must be deployed on Netlify with ADMIN_PASSWORD set."}}
+$("#lb").onclick=login;$("#pw").onkeydown=function(e){if(e.key=="Enter")login()};
+$("#lo").onclick=function(){sessionStorage.removeItem(K);location.reload()};
+
+async function start(){
+ $("#lg").hidden=true;$("#app").hidden=false;
+ var c=await fetch("/api/catalog").then(function(r){return r.json()}).catch(function(){return{}});
+ S.products=(c.products&&c.products.length)?c.products:DEF.products;
+ S.site=Object.assign({},DEF.site,c.site||{});
+ S.products.forEach(function(p){p.q0=p.q});
+ drawP();drawG();show("tp")}
+if(pw)api("admin/ping").then(start).catch(function(){});
+
+function show(id){["tp","tg","to","ts2"].forEach(function(t){$("#"+t).hidden=t!=id});document.querySelectorAll(".tab").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.t==id)});$("#sv").hidden=id=="to"||id=="ts2";if(id=="to")loadO();if(id=="ts2")loadS()}
+document.querySelectorAll(".tab").forEach(function(b){b.onclick=function(){show(b.dataset.t)}});
+
+/* ---------- products ---------- */
+var CATS={baby:"Baby Care",home:"Household",cosm:"Cosmetics"},ICONS=["bottle","pac","toy","drop","box","spoon","basket"];
+function opts(o,v){return Object.keys(o).map(function(k){return'<option value="'+k+'"'+(k==v?" selected":"")+'>'+o[k]+'</option>'}).join("")}
+function drawP(){
+ $("#tp").innerHTML='<p class="hint">Open a product to edit it. Leave Stock empty for unlimited. Press <b>Save changes</b> (top) to update the live site.</p>'+
+ S.products.map(function(p,i){return'<details class="pc"><summary>'+(p.img?'<img class="th" src="'+esc(p.img)+'" alt="">':'<span class="th"></span>')+'<b>'+esc(p.n||"New product")+'</b><span>'+CATS[p.c]+' · Rs. '+p.p+' · Stock: '+(p.q==null?"unlimited":p.q)+'</span></summary><div class="fg">'+
+ '<label>Name</label><input data-i="'+i+'" data-k="n" value="'+esc(p.n)+'">'+
+ '<div class="g2"><div><label>Category</label><select data-i="'+i+'" data-k="c">'+opts(CATS,p.c)+'</select></div>'+
+ '<div><label>Price (Rs.)</label><input type="number" min="0" data-i="'+i+'" data-k="p" value="'+p.p+'"></div>'+
+ '<div><label>Old price (for sale badge, optional)</label><input type="number" min="0" data-i="'+i+'" data-k="o" value="'+(p.o||"")+'"></div>'+
+ '<div><label>Stock quantity</label><input type="number" min="0" data-i="'+i+'" data-k="q" value="'+(p.q==null?"":p.q)+'"></div>'+
+ '<div><label>Size / pack</label><input data-i="'+i+'" data-k="z" value="'+esc(p.z)+'"></div>'+
+ '<div><label>Icon (if no photo)</label><select data-i="'+i+'" data-k="i">'+ICONS.map(function(x){return'<option'+(x==p.i?" selected":"")+'>'+x+'</option>'}).join("")+'</select></div></div>'+
+ '<label>Short description</label><input data-i="'+i+'" data-k="d" value="'+esc(p.d)+'">'+
+ '<label>Full description</label><textarea data-i="'+i+'" data-k="l">'+esc(p.l)+'</textarea>'+
+ '<label>Features (one per line)</label><textarea data-i="'+i+'" data-k="f">'+esc((p.f||[]).join("\n"))+'</textarea>'+
+ '<label>Product photo</label><input type="file" accept="image/*" data-up="'+i+'"> '+(p.img?'<button data-rm="'+i+'">Remove photo</button>':'')+
+ '<p><button class="d" data-del="'+i+'">Delete product</button></p></div></details>'}).join("")+
+ '<p><button class="p" id="add">+ Add product</button></p>'}
+$("#tp").addEventListener("input",function(e){var t=e.target,i=t.dataset.i;if(i==null)return;var p=S.products[i],k=t.dataset.k,v=t.value;
+ if(k=="p")p.p=+v||0;else if(k=="o"){if(v)p.o=+v;else delete p.o}else if(k=="q"){if(v==="")delete p.q;else p.q=Math.max(0,parseInt(v)||0)}
+ else if(k=="f")p.f=v.split("\n").map(function(x){return x.trim()}).filter(Boolean);else p[k]=v});
+$("#tp").addEventListener("click",function(e){var t=e.target;
+ if(t.id=="add"){var id=S.products.reduce(function(m,p){return Math.max(m,+p.id||0)},0)+1;S.products.push({id:id,n:"",c:"baby",p:0,i:"box",z:"",d:"",l:"",f:[],q:0});drawP();var d=document.querySelectorAll(".pc");d[d.length-1].open=true;d[d.length-1].scrollIntoView()}
+ else if(t.dataset.del!=null&&confirm("Delete this product?")){S.products.splice(t.dataset.del,1);drawP()}
+ else if(t.dataset.rm!=null){delete S.products[t.dataset.rm].img;drawP()}});
+$("#tp").addEventListener("change",async function(e){var t=e.target;if(t.dataset.up==null||!t.files[0])return;
+ try{toast("Uploading photo...");var d=await shrink(t.files[0]),r=await api("admin/upload",{method:"POST",body:JSON.stringify({data:d})});S.products[t.dataset.up].img=r.url;
+ var open=t.dataset.up;drawP();document.querySelectorAll(".pc")[open].open=true;toast("Photo added. Press Save changes.")}catch(x){toast("Upload failed")}});
+function shrink(f){return new Promise(function(ok,no){var im=new Image;im.onload=function(){var s=Math.min(1,800/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=im.width*s;c.height=im.height*s;c.getContext("2d").drawImage(im,0,0,c.width,c.height);ok(c.toDataURL("image/jpeg",.82))};im.onerror=no;im.src=URL.createObjectURL(f)})}
+
+/* ---------- page details ---------- */
+var FIELDS=[["ann","Top announcement bar","t"],["h1","Main headline","t"],["hp","Headline text","a"],["email","Email address (footer)","t"],["wa","WhatsApp number (92xxxxxxxxxx, no + or spaces)","t"],["delCod","Delivery charge, cash on delivery (Rs.)","n"],["delOnline","Delivery charge, online payment (Rs.)","n"],["bank","Bank name","t"],["title","Account title","t"],["acct","Account number / IBAN","t"],["jazz","JazzCash number","t"]];
+function drawG(){
+ $("#tg").innerHTML='<div class="box">'+FIELDS.map(function(f){var v=esc(S.site[f[0]]);return'<label>'+f[1]+'</label>'+(f[2]=="a"?'<textarea data-s="'+f[0]+'">'+v+'</textarea>':'<input '+(f[2]=="n"?'type="number" ':'')+'data-s="'+f[0]+'" value="'+v+'">')}).join("")+
+ '<h2>Categories marked "Coming soon"</h2>'+Object.keys(CATS).map(function(k){return'<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" style="width:24px;min-height:24px" data-soon="'+k+'"'+((S.site.soon||[]).indexOf(k)>-1?" checked":"")+'> '+CATS[k]+'</label>'}).join("")+'<p class="hint">Products in a coming-soon category are hidden from customers until you untick it.</p></div>'}
+$("#tg").addEventListener("input",function(e){var k=e.target.dataset.s;if(k)S.site[k]=e.target.value});
+$("#tg").addEventListener("change",function(e){var k=e.target.dataset.soon;if(!k)return;var a=S.site.soon||[];a=a.filter(function(x){return x!=k});if(e.target.checked)a.push(k);S.site.soon=a});
+
+/* ---------- save ---------- */
+$("#sv").onclick=async function(){var b=this;b.disabled=true;b.textContent="Saving...";
+ try{await api("admin/catalog",{method:"PUT",body:JSON.stringify({products:S.products,site:S.site})});toast("Saved. Your live site is updated.");await start()}
+ catch(e){toast(e.message=="auth"?"Session expired. Log in again.":"Could not save: "+e.message)}
+ b.disabled=false;b.textContent="Save changes"};
+
+/* ---------- orders ---------- */
+async function loadO(){$("#to").innerHTML="<p>Loading...</p>";
+ try{O=(await api("admin/orders")).orders}catch(e){$("#to").innerHTML="<p>Could not load orders.</p>";return}
+ $("#to").innerHTML='<p><button id="csv">Download as CSV</button> <span class="hint">'+O.length+' orders</span></p>'+(O.length?O.map(function(o){return'<div class="oc"><div class="oh"><b>'+esc(o.id)+'</b><span>'+new Date(o.ts).toLocaleString()+'</span><select data-key="'+esc(o.key)+'">'+ST.map(function(s){return'<option'+(s==o.status?" selected":"")+'>'+s+'</option>'}).join("")+'</select></div><p><b>'+esc(o.name)+'</b> · <a href="tel:'+esc(o.phone)+'">'+esc(o.phone)+'</a><br>'+esc(o.address)+'</p><ul>'+o.items.map(function(i){return'<li>'+i.qty+' × '+esc(i.n)+' — Rs. '+(i.p*i.qty)+'</li>'}).join("")+'</ul><b>Total Rs. '+o.total+'</b> <span class="hint">('+(o.pay=="cod"?"cash on delivery":"online payment")+', delivery Rs. '+o.delivery+')</span></div>'}).join(""):"<p>No orders yet.</p>")}
+$("#to").addEventListener("change",async function(e){var k=e.target.dataset.key;if(!k)return;try{await api("admin/order-status",{method:"POST",body:JSON.stringify({key:k,status:e.target.value})});toast("Status updated")}catch(x){toast("Failed")}});
+$("#to").addEventListener("click",function(e){if(e.target.id!="csv")return;
+ var q=function(v){return'"'+String(v).replace(/"/g,'""')+'"'},rows=[["Order","Date","Status","Name","Phone","Address","Items","Items total","Delivery","Total","Payment"]].concat(O.map(function(o){return[o.id,new Date(o.ts).toISOString(),o.status,o.name,o.phone,o.address,o.items.map(function(i){return i.qty+"x "+i.n}).join("; "),o.itemsTotal,o.delivery,o.total,o.pay]}));
+ var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([rows.map(function(r){return r.map(q).join(",")}).join("\n")],{type:"text/csv"}));a.download="chinawalaa-orders.csv";a.click()});
+
+/* ---------- email list ---------- */
+async function loadS(){try{var r=(await api("admin/subscribers")).subs;$("#ts2").innerHTML='<div class="box"><b>'+r.length+' people waiting for new categories</b><p>'+(r.map(function(s){return esc(s.email)}).join("<br>")||"None yet.")+'</p></div>'}catch(e){$("#ts2").innerHTML="<p>Could not load.</p>"}}
+</script></body></html>
