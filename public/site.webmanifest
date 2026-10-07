@@ -1,0 +1,21 @@
+{
+  "name": "Chinawalaa",
+  "short_name": "Chinawalaa",
+  "description": "Shop quality imported baby care products and household essentials at Chinawalaa. Feeding bottles, pacifiers, toys, kitchen storage and more. Cash on delivery or online payment, order via WhatsApp.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#F7F6F0",
+  "theme_color": "#F7F6F0",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
