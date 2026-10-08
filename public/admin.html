@@ -32,9 +32,9 @@ button{min-height:44px;padding:0 16px;border-radius:10px;border:2px solid var(--
 
 <div id="app" class="w" hidden>
 <div class="bar"><h1>Admin</h1>
-<button class="tab" data-t="tp">Products</button><button class="tab" data-t="tg">Page details</button><button class="tab" data-t="to">Orders</button><button class="tab" data-t="ts2">Email list</button>
+<button class="tab" data-t="tp">Products</button><button class="tab" data-t="tg">Page details</button><button class="tab" data-t="to">Orders</button><button class="tab" data-t="ts2">Email list</button><button class="tab" data-t="tce">Checkout emails</button>
 <span class="sp"></span><button class="p" id="sv">Save changes</button><button id="lo">Log out</button></div>
-<div id="tp"></div><div id="tg" hidden></div><div id="to" hidden></div><div id="ts2" hidden></div>
+<div id="tp"></div><div id="tg" hidden></div><div id="to" hidden></div><div id="ts2" hidden></div><div id="tce" hidden></div>
 </div><div id="ts" role="status"></div>
 
 <script>
@@ -58,7 +58,7 @@ async function start(){
  drawP();drawG();show("tp")}
 if(pw)api("admin/ping").then(start).catch(function(){});
 
-function show(id){["tp","tg","to","ts2"].forEach(function(t){$("#"+t).hidden=t!=id});document.querySelectorAll(".tab").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.t==id)});$("#sv").hidden=id=="to"||id=="ts2";if(id=="to")loadO();if(id=="ts2")loadS()}
+function show(id){["tp","tg","to","ts2","tce"].forEach(function(t){$("#"+t).hidden=t!=id});document.querySelectorAll(".tab").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.t==id)});$("#sv").hidden=id=="to"||id=="ts2"||id=="tce";if(id=="to")loadO();if(id=="ts2")loadS();if(id=="tce")loadCE()}
 document.querySelectorAll(".tab").forEach(function(b){b.onclick=function(){show(b.dataset.t)}});
 
 /* ---------- products ---------- */
@@ -135,4 +135,20 @@ $("#to").addEventListener("click",function(e){if(e.target.id!="csv")return;
 
 /* ---------- email list ---------- */
 async function loadS(){try{var r=(await api("admin/subscribers")).subs;$("#ts2").innerHTML='<div class="box"><b>'+r.length+' people waiting for new categories</b><p>'+(r.map(function(s){return esc(s.email)}).join("<br>")||"None yet.")+'</p></div>'}catch(e){$("#ts2").innerHTML="<p>Could not load.</p>"}}
+
+/* ---------- checkout emails (for promotional mailing) ---------- */
+var CE=[];
+async function loadCE(){$("#tce").innerHTML="<p>Loading...</p>";
+ try{CE=(await api("admin/checkout-emails")).emails||[]}catch(e){$("#tce").innerHTML="<p>Could not load checkout emails.</p>";return}
+ CE.sort(function(a,b){return(b.ts||0)-(a.ts||0)});
+ $("#tce").innerHTML='<div class="box"><b>'+CE.length+' customer email'+(CE.length==1?"":"s")+' collected at checkout</b>'+
+  '<p class="hint">Customers type these in the optional Email field when placing an order. Use them for promotional emails.</p>'+
+  '<p><button class="p" id="ceCsv">Download as CSV</button> <button id="ceCopy">Copy all emails</button></p>'+
+  (CE.length?'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr style="text-align:left"><th style="padding:6px;border-bottom:2px solid var(--line)">Email</th><th style="padding:6px;border-bottom:2px solid var(--line)">Name</th><th style="padding:6px;border-bottom:2px solid var(--line)">Phone</th><th style="padding:6px;border-bottom:2px solid var(--line)">Date</th><th style="padding:6px;border-bottom:2px solid var(--line)"></th></tr></thead><tbody>'+
+  CE.map(function(c){return'<tr><td style="padding:6px;border-bottom:1px solid var(--line)">'+esc(c.email)+'</td><td style="padding:6px;border-bottom:1px solid var(--line)">'+esc(c.name)+'</td><td style="padding:6px;border-bottom:1px solid var(--line)">'+esc(c.phone)+'</td><td style="padding:6px;border-bottom:1px solid var(--line)">'+(c.ts?new Date(c.ts).toLocaleDateString():"")+'</td><td style="padding:6px;border-bottom:1px solid var(--line)"><button class="d" style="min-height:32px" data-ced="'+esc(c.email)+'">Remove</button></td></tr>'}).join("")+'</tbody></table></div>':'<p>None yet.</p>')+'</div>'}
+$("#tce").addEventListener("click",async function(e){var t=e.target;
+ if(t.id=="ceCsv"){var q=function(v){return'"'+String(v==null?"":v).replace(/"/g,'""')+'"'},rows=[["Email","Name","Phone","Order","Date"]].concat(CE.map(function(c){return[c.email,c.name,c.phone,c.orderId,c.ts?new Date(c.ts).toISOString():""]}));
+  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([rows.map(function(r){return r.map(q).join(",")}).join("\n")],{type:"text/csv"}));a.download="chinawalaa-checkout-emails.csv";a.click()}
+ else if(t.id=="ceCopy"){var txt=CE.map(function(c){return c.email}).join(", ");try{await navigator.clipboard.writeText(txt);toast("Copied "+CE.length+" emails")}catch(x){toast("Copy failed")}}
+ else if(t.dataset.ced!=null&&confirm("Remove "+t.dataset.ced+" from the list?")){try{await api("admin/checkout-emails",{method:"DELETE",body:JSON.stringify({email:t.dataset.ced})});toast("Removed");loadCE()}catch(x){toast("Failed")}}});
 </script></body></html>
