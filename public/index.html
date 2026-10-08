@@ -699,7 +699,7 @@ async function sendOrder(){
  if(st.pay=="online"&&/X/.test(WA)){e.textContent="Store owner: add your WhatsApp number in the site settings to receive orders.";e.hidden=false;return}
  var oid="CW-"+Date.now().toString(36).toUpperCase();var m="New order "+oid+" from Chinawalaa website\n\n"+Object.keys(st.cart).map(function(k){var x=find(k);return st.cart[k]+" x "+x.n+" - "+fm(x.p*st.cart[k])}).join("\n")+"\n\nItems total: "+fm(total())+"\nDelivery charges: "+fm(DEL[st.pay])+"\nTotal payable: "+fm(total()+DEL[st.pay])+"\nPayment method: "+(st.pay=="cod"?"Cash on delivery":"Online payment (JazzCash or bank transfer)")+"\n\nName: "+n+"\nPhone: "+p+"\nEmail: "+em+"\nDelivery address: "+a+(st.pay=="online"?"\n\nI have paid by JazzCash / bank transfer. Sending the receipt screenshot here.":"");
  var u="https://wa.me/"+WA+"?text="+encodeURIComponent(m);st.url=u;st.oid=oid;
- var ob=JSON.stringify({id:oid,name:n,phone:p,email:em,address:a,pay:st.pay,delivery:DEL[st.pay],items:Object.keys(st.cart).map(function(k){var x=find(k);return{id:k,qty:st.cart[k],n:x.n,p:x.p}})});
+ var ob=JSON.stringify({id:oid,name:n,phone:p,email:em,address:"Email: "+em+"\n"+a,pay:st.pay,delivery:DEL[st.pay],items:Object.keys(st.cart).map(function(k){var x=find(k);return{id:k,qty:st.cart[k],n:x.n,p:x.p}})});
  if(st.pay=="online"){
   postOrder(ob);
   window.open(u,"_blank")}
