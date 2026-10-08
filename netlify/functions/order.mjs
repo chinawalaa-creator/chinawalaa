@@ -23,7 +23,9 @@ export default async (req) => {
     const phone = clip(b.phone, 20).replace(/\D/g, "");
     const address = clip(b.address, 500).trim();
     const pay = b.pay === "online" ? "online" : "cod";
+    const email = clip(b.email, 200).trim().toLowerCase();
     if (!/^CW-[A-Z0-9]+$/.test(id) || !name || !phone || !address) return J({ error: "Missing details" }, 400);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return J({ error: "A valid email is required" }, 400);
     if (!Array.isArray(b.items) || !b.items.length || b.items.length > 50) return J({ error: "No items" }, 400);
 
     const items = b.items.map((i) => ({
@@ -38,9 +40,13 @@ export default async (req) => {
     if (await store.get(id).catch(() => null)) return J({ ok: true, id }); // retry of same order
     await store.setJSON(id, {
       key: id, id, ts: Date.now(), status: "new",
-      name, phone, email: clip(b.email, 200).toLowerCase(), address, pay,
+      name, phone, email, address, pay,
       items, itemsTotal, delivery, total: itemsTotal + delivery,
     });
+    // keep the email for promotions (same list as the Checkout emails tab)
+    const em = getStore("checkout-emails");
+    const old = await em.get(email, { type: "json" }).catch(() => null);
+    await em.setJSON(email, { email, name, phone, orderId: id, ts: old?.ts || Date.now() }).catch(() => {});
     return J({ ok: true, id });
   }
 
