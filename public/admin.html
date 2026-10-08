@@ -127,10 +127,10 @@ $("#sv").onclick=async function(){var b=this;b.disabled=true;b.textContent="Savi
 /* ---------- orders ---------- */
 async function loadO(){$("#to").innerHTML="<p>Loading...</p>";
  try{O=(await api("admin/orders")).orders}catch(e){$("#to").innerHTML="<p>Could not load orders.</p>";return}
- $("#to").innerHTML='<p><button id="csv">Download as CSV</button> <span class="hint">'+O.length+' orders</span></p>'+(O.length?O.map(function(o){return'<div class="oc"><div class="oh"><b>'+esc(o.id)+'</b><span>'+new Date(o.ts).toLocaleString()+'</span><select data-key="'+esc(o.key)+'">'+ST.map(function(s){return'<option'+(s==o.status?" selected":"")+'>'+s+'</option>'}).join("")+'</select></div><p><b>'+esc(o.name)+'</b> · <a href="tel:'+esc(o.phone)+'">'+esc(o.phone)+'</a><br>'+esc(o.address)+'</p><ul>'+o.items.map(function(i){return'<li>'+i.qty+' × '+esc(i.n)+' — Rs. '+(i.p*i.qty)+'</li>'}).join("")+'</ul><b>Total Rs. '+o.total+'</b> <span class="hint">('+(o.pay=="cod"?"cash on delivery":"online payment")+', delivery Rs. '+o.delivery+')</span></div>'}).join(""):"<p>No orders yet.</p>")}
+ $("#to").innerHTML='<p><button id="csv">Download as CSV</button> <span class="hint">'+O.length+' orders</span></p>'+(O.length?O.map(function(o){return'<div class="oc"><div class="oh"><b>'+esc(o.id)+'</b><span>'+new Date(o.ts).toLocaleString()+'</span><select data-key="'+esc(o.key)+'">'+ST.map(function(s){return'<option'+(s==o.status?" selected":"")+'>'+s+'</option>'}).join("")+'</select></div><p><b>'+esc(o.name)+'</b> · <a href="tel:'+esc(o.phone)+'">'+esc(o.phone)+'</a><br>'+(o.email?'<a href="mailto:'+esc(o.email)+'">'+esc(o.email)+'</a><br>':'')+esc(o.address)+'</p><ul>'+o.items.map(function(i){return'<li>'+i.qty+' × '+esc(i.n)+' — Rs. '+(i.p*i.qty)+'</li>'}).join("")+'</ul><b>Total Rs. '+o.total+'</b> <span class="hint">('+(o.pay=="cod"?"cash on delivery":"online payment")+', delivery Rs. '+o.delivery+')</span></div>'}).join(""):"<p>No orders yet.</p>")}
 $("#to").addEventListener("change",async function(e){var k=e.target.dataset.key;if(!k)return;try{await api("admin/order-status",{method:"POST",body:JSON.stringify({key:k,status:e.target.value})});toast("Status updated")}catch(x){toast("Failed")}});
 $("#to").addEventListener("click",function(e){if(e.target.id!="csv")return;
- var q=function(v){return'"'+String(v).replace(/"/g,'""')+'"'},rows=[["Order","Date","Status","Name","Phone","Address","Items","Items total","Delivery","Total","Payment"]].concat(O.map(function(o){return[o.id,new Date(o.ts).toISOString(),o.status,o.name,o.phone,o.address,o.items.map(function(i){return i.qty+"x "+i.n}).join("; "),o.itemsTotal,o.delivery,o.total,o.pay]}));
+ var q=function(v){return'"'+String(v).replace(/"/g,'""')+'"'},rows=[["Order","Date","Status","Name","Phone","Email","Address","Items","Items total","Delivery","Total","Payment"]].concat(O.map(function(o){return[o.id,new Date(o.ts).toISOString(),o.status,o.name,o.phone,o.email||"",o.address,o.items.map(function(i){return i.qty+"x "+i.n}).join("; "),o.itemsTotal,o.delivery,o.total,o.pay]}));
  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([rows.map(function(r){return r.map(q).join(",")}).join("\n")],{type:"text/csv"}));a.download="chinawalaa-orders.csv";a.click()});
 
 /* ---------- email list ---------- */
@@ -139,7 +139,10 @@ async function loadS(){try{var r=(await api("admin/subscribers")).subs;$("#ts2")
 /* ---------- checkout emails (for promotional mailing) ---------- */
 var CE=[];
 async function loadCE(){$("#tce").innerHTML="<p>Loading...</p>";
- try{CE=(await api("admin/checkout-emails")).emails||[]}catch(e){$("#tce").innerHTML="<p>Could not load checkout emails.</p>";return}
+ var seen={},bad=0;CE=[];
+ try{(await api("admin/checkout-emails")).emails.forEach(function(c){if(c&&c.email&&!seen[c.email]){seen[c.email]=1;CE.push(c)}})}catch(e){bad++}
+ try{(await api("admin/orders")).orders.forEach(function(o){var m=String(o.email||"").toLowerCase();if(m&&!seen[m]){seen[m]=1;CE.push({email:m,name:o.name,phone:o.phone,orderId:o.id,ts:o.ts})}})}catch(e){bad++}
+ if(bad==2){$("#tce").innerHTML="<p>Could not load checkout emails.</p>";return}
  CE.sort(function(a,b){return(b.ts||0)-(a.ts||0)});
  $("#tce").innerHTML='<div class="box"><b>'+CE.length+' customer email'+(CE.length==1?"":"s")+' collected at checkout</b>'+
   '<p class="hint">Customers type these in the optional Email field when placing an order. Use them for promotional emails.</p>'+
